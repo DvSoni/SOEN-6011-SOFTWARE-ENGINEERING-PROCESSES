@@ -16,14 +16,50 @@ Chain of dependencies:
 
 Traceability to requirements (Problem 2 / updated in Problem 7):
     REQ-001, REQ-002 : accept x, y and compute B(x, y)
-    REQ-003           : reject x <= 0 or y <= 0
+    REQ-003           : reject x <= 0 or y <= 0 (NonPositiveValueError)
     REQ-004           : minimum 6 significant digits of precision
     REQ-007, REQ-008  : no external libraries, no built-in exponent operator
+    REQ-009           : custom exception hierarchy gives specific,
+                         readable error messages instead of generic ones
+
+Custom exception hierarchy:
+    BetaFunctionError            <- base class, catches all of the below
+        NonPositiveValueError    <- x or y is zero or negative
+        UndefinedOperationError  <- e.g. ln() of a non-positive number
+        UnsupportedDomainError   <- e.g. negative base in real_power
 """
 
 
-class InvalidInputError(Exception):
-    """Custom exception raised when x or y is not a valid positive real number."""
+class BetaFunctionError(Exception):
+    """
+    Base class for all custom errors raised by this module.
+    Catching this alone (instead of each specific subclass) will
+    catch any error coming from the Beta function calculation.
+    """
+    pass
+
+
+class NonPositiveValueError(BetaFunctionError):
+    """Raised when x or y is zero or negative (violates REQ-003)."""
+    pass
+
+
+class UndefinedOperationError(BetaFunctionError):
+    """
+    Raised when a mathematical operation inside the from-scratch
+    functions is undefined, e.g. 0 raised to a non-positive power,
+    or ln() of a non-positive number.
+    """
+    pass
+
+
+class UnsupportedDomainError(BetaFunctionError):
+    """
+    Raised when a value falls outside what this from-scratch
+    implementation supports, e.g. a negative base for real_power
+    (not required by the Beta function's domain, so it is
+    intentionally unsupported rather than silently guessed at).
+    """
     pass
 
 
@@ -68,7 +104,7 @@ def my_ln(y):
     since the series converges quickly only near y = 1.
     """
     if y <= 0:
-        raise InvalidInputError("Cannot take ln of a non-positive number.")
+        raise UndefinedOperationError("Cannot take ln of a non-positive number.")
 
     def ln_series(v):
         u = (v - 1) / (v + 1)
@@ -105,9 +141,9 @@ def real_power(base, exponent):
     if base == 0:
         if exponent > 0:
             return 0.0
-        raise InvalidInputError("0 raised to a non-positive power is undefined.")
+        raise UndefinedOperationError("0 raised to a non-positive power is undefined.")
     if base < 0:
-        raise InvalidInputError("Negative base is not supported (not needed for this function's domain).")
+        raise UnsupportedDomainError("Negative base is not supported (not needed for this function's domain).")
 
     return my_exp(exponent * my_ln(base))
 
@@ -128,7 +164,7 @@ def beta_via_integration(x, y, n=1000):
     Raises InvalidInputError if x or y is not strictly positive.
     """
     if x <= 0 or y <= 0:
-        raise InvalidInputError("Both x and y must be strictly positive.")
+        raise NonPositiveValueError("Both x and y must be strictly positive.")
 
     a = 0.00001
     b = 0.99999
@@ -155,5 +191,15 @@ if __name__ == "__main__":
 
     try:
         beta_via_integration(-1.0, 3.0)
-    except InvalidInputError as e:
-        print("Correctly caught error:", e)
+    except NonPositiveValueError as e:
+        print("Correctly caught NonPositiveValueError:", e)
+
+    try:
+        real_power(-2.0, 3.0)
+    except UnsupportedDomainError as e:
+        print("Correctly caught UnsupportedDomainError:", e)
+
+    try:
+        my_ln(0.0)
+    except UndefinedOperationError as e:
+        print("Correctly caught UndefinedOperationError:", e)

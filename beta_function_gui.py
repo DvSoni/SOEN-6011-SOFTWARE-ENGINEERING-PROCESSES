@@ -20,7 +20,7 @@ Traceability to requirements:
 import tkinter as tk
 from tkinter import ttk
 
-from beta_function_scratch import beta_via_integration, InvalidInputError
+from beta_function_scratch import beta_via_integration, BetaFunctionError
 
 
 class BetaFunctionApp:
@@ -96,7 +96,10 @@ class BetaFunctionApp:
 
         try:
             result = beta_via_integration(x, y)
-        except InvalidInputError as e:
+        except BetaFunctionError as e:
+            # Catches NonPositiveValueError, UndefinedOperationError,
+            # and UnsupportedDomainError - all inherit from BetaFunctionError,
+            # so this one handler covers every custom exception type.
             self.error_label.config(text=f"Error: {e}")
             return
 
