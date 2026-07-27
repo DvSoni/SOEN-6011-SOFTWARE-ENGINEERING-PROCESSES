@@ -1,20 +1,22 @@
 """
 SOEN 6011 - Deliverable 2, Problem 5
-Beta function B(x, y) - Graphical User Interface (Tkinter)
+Beta function B(x, y) - GUI version using Tkinter
 
-This GUI is a thin wrapper around beta_function_scratch.py, which
-contains the actual from-scratch math (no ** operator, no external
-libraries). This file only handles displaying input fields, a
-button, and showing the result or an error message.
+This file is just the interface -- two text boxes, a button, and a
+label to show the result or an error. All the actual math lives in
+beta_function_scratch.py, this file just calls it.
 
-Traceability to requirements:
-    REQ-003, REQ-009 : invalid input is caught and shown as a clear,
-                        plain-language error message in the GUI
-                        (not a crash)
-    REQ-010           : runs standalone via `python3 beta_function_gui.py`,
-                        no IDE dependency
-    REQ-011           : the GUI echoes the input values alongside
-                        the computed result
+I kept it split into two files on purpose: this way the math can be
+tested completely on its own (see the unit tests later on) without
+needing the GUI to even open.
+
+Which requirement each part is for:
+    REQ-003, REQ-009 : bad input gets caught and shown as a clear
+                        message instead of crashing the program
+    REQ-010          : just run "python3 beta_function_gui.py",
+                        no IDE needed
+    REQ-011          : shows the input values next to the answer,
+                        so you can double check what you typed
 """
 
 import tkinter as tk
@@ -40,69 +42,92 @@ class BetaFunctionApp:
         )
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 15))
 
-        # --- x input ---
+        # box for x
         ttk.Label(main_frame, text="x (must be > 0):").grid(
             row=1, column=0, sticky="w", pady=5
         )
         self.x_entry = ttk.Entry(main_frame, width=15)
         self.x_entry.grid(row=1, column=1, pady=5)
 
-        # --- y input ---
+        # box for y
         ttk.Label(main_frame, text="y (must be > 0):").grid(
             row=2, column=0, sticky="w", pady=5
         )
         self.y_entry = ttk.Entry(main_frame, width=15)
         self.y_entry.grid(row=2, column=1, pady=5)
 
-        # --- Calculate button ---
+        # calculate button, runs on_calculate when clicked
         calculate_button = ttk.Button(
             main_frame, text="Calculate", command=self.on_calculate
         )
         calculate_button.grid(row=3, column=0, columnspan=2, pady=15)
 
-        # --- Result / error display ---
+        # this label shows the answer once it's calculated
         self.result_label = ttk.Label(
             main_frame, text="", font=("Helvetica", 11), foreground="black"
         )
         self.result_label.grid(row=4, column=0, columnspan=2, pady=5)
 
+        # this one shows error messages in red if something went wrong
         self.error_label = ttk.Label(
             main_frame, text="", font=("Helvetica", 10), foreground="red", wraplength=360
         )
         self.error_label.grid(row=5, column=0, columnspan=2, pady=5)
 
-        # Let Enter key trigger calculation too
+        # so pressing Enter also triggers Calculate, not just clicking the button
         root.bind("<Return>", lambda event: self.on_calculate())
 
     def on_calculate(self):
-        # clear previous messages
+        # clear out whatever was shown from last time first
         self.result_label.config(text="")
         self.error_label.config(text="")
 
         x_raw = self.x_entry.get()
         y_raw = self.y_entry.get()
 
+        # try converting both to numbers before deciding what error to
+        # show -- this way if BOTH boxes are bad, the message mentions
+        # both instead of only complaining about x and hiding the fact
+        # y is also wrong
+        x_is_valid = True
+        y_is_valid = True
+
         try:
             x = float(x_raw)
         except ValueError:
-            self.error_label.config(text=f"Error: '{x_raw}' is not a valid number for x.")
-            return
+            x_is_valid = False
 
         try:
             y = float(y_raw)
         except ValueError:
+            y_is_valid = False
+
+        if not x_is_valid and not y_is_valid:
+            self.error_label.config(
+                text=f"Error: '{x_raw}' is not a valid number for x, "
+                     f"and '{y_raw}' is not a valid number for y."
+            )
+            return
+        if not x_is_valid:
+            self.error_label.config(text=f"Error: '{x_raw}' is not a valid number for x.")
+            return
+        if not y_is_valid:
             self.error_label.config(text=f"Error: '{y_raw}' is not a valid number for y.")
             return
 
+        # now that x and y are valid numbers, actually run the calculation
         try:
             result = beta_via_integration(x, y)
         except BetaFunctionError as e:
-            # Catches NonPositiveValueError, UndefinedOperationError,
-            # and UnsupportedDomainError - all inherit from BetaFunctionError,
-            # so this one handler covers every custom exception type.
+            # catching the parent class here catches NonPositiveValueError,
+            # UndefinedOperationError, and UnsupportedDomainError all at
+            # once, don't need a separate except for each one
             self.error_label.config(text=f"Error: {e}")
             return
 
+        # if the answer is really tiny, showing 6 decimal places would
+        # just print 0.000000 which looks wrong, so switch to scientific
+        # notation in that case instead
         if abs(result) < 1e-6:
             result_text = f"B({x}, {y}) = {result:.6e}"
         else:
