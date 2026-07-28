@@ -104,15 +104,15 @@ class BetaFunctionApp:
 
         if not x_is_valid and not y_is_valid:
             self.error_label.config(
-                text=f"Error: '{x_raw}' is not a valid number for x, "
-                     f"and '{y_raw}' is not a valid number for y."
+                text=f"Error: Please enter a valid number for x instead of '{x_raw}', "
+                     f"and enter a valid number for y instead of '{y_raw}'."
             )
             return
         if not x_is_valid:
-            self.error_label.config(text=f"Error: '{x_raw}' is not a valid number for x.")
+            self.error_label.config(text=f"Please enter a valid number for x instead of '{x_raw}'.")
             return
         if not y_is_valid:
-            self.error_label.config(text=f"Error: '{y_raw}' is not a valid number for y.")
+            self.error_label.config(text=f"Please enter a valid number for y instead of '{y_raw}'.")
             return
 
         # now that x and y are valid numbers, actually run the calculation
