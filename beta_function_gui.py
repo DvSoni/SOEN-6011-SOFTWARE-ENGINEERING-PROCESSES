@@ -109,10 +109,10 @@ class BetaFunctionApp:
             )
             return
         if not x_is_valid:
-            self.error_label.config(text=f"Please enter a valid number for x instead of '{x_raw}'.")
+            self.error_label.config(text=f"Please enter a numeric value greater than 0 for x instead of '{x_raw}'.")
             return
         if not y_is_valid:
-            self.error_label.config(text=f"Please enter a valid number for y instead of '{y_raw}'.")
+            self.error_label.config(text=f"Please enter a valid number strictly greater than 0 for y instead of '{y_raw}'.")
             return
 
         # now that x and y are valid numbers, actually run the calculation
