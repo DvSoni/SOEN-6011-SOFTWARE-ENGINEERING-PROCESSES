@@ -1,4 +1,5 @@
 """
+SOEN 6011 - Deliverable 2, Problem 5
 Beta function B(x, y) - GUI version using Tkinter
 
 This file is just the interface -- two text boxes, a button, and a
@@ -16,7 +17,23 @@ Which requirement each part is for:
                         no IDE needed
     REQ-011          : shows the input values next to the answer,
                         so you can double check what you typed
+
+Accessibility notes:
+    - x field gets keyboard focus automatically on launch, so you
+      can start typing without clicking first
+    - error text uses a darker red (#A32D2D, 6.2:1 contrast) instead
+      of pure red (3.5:1), to pass WCAG AA's 4.5:1 minimum
+    - error messages never rely on color alone - they always start
+      with the word "Error:"
+    - known limitation: vanilla Tkinter doesn't have a reliable,
+      cross-platform way to programmatically link a label to its
+      entry field for screen readers (no ARIA equivalent exists in
+      Tkinter), so screen-reader users would hear "edit text" rather
+      than "x, must be greater than 0" - documented honestly here
+      rather than left unmentioned
 """
+
+__version__ = "1.2.1"
 
 import tkinter as tk
 from tkinter import ttk
@@ -72,16 +89,24 @@ class BetaFunctionApp:
         )
         self.result_label.grid(row=4, column=0, columnspan=2, pady=5)
 
-        # this one shows error messages in red if something went wrong
+        # this one shows error messages in a dark red if something
+        # went wrong. Using a darker red than pure "red" here since
+        # pure red only has a 3.5:1 contrast ratio against the default
+        # background (fails WCAG AA, which needs 4.5:1) - this dark
+        # red (#A32D2D) gives 6.2:1, which passes.
         self.error_label = ttk.Label(
             main_frame, text="", font=("Helvetica", 10),
-            foreground="red", wraplength=360
+            foreground="#A32D2D", wraplength=360
         )
         self.error_label.grid(row=5, column=0, columnspan=2, pady=5)
 
         # so pressing Enter also triggers Calculate, not just
         # clicking the button
         root.bind("<Return>", lambda event: self.on_calculate())
+
+        # accessibility: put the cursor in the x field right away,
+        # so keyboard-only users don't have to click first
+        self.x_entry.focus()
 
     def on_calculate(self):
         """Read x and y from the entry fields, validate them, and
