@@ -26,6 +26,11 @@ from beta_function_scratch import beta_via_integration, BetaFunctionError
 
 
 class BetaFunctionApp:
+    # pylint: disable=too-few-public-methods
+    # This class only needs one public method (on_calculate) - it's
+    # a thin GUI wrapper, not meant to have a larger public interface.
+    """Tkinter GUI wrapper around the from-scratch Beta function."""
+
     def __init__(self, root):
         self.root = root
         self.root.title("Beta Function B(x, y) Calculator")
@@ -80,6 +85,8 @@ class BetaFunctionApp:
         root.bind("<Return>", lambda event: self.on_calculate())
 
     def on_calculate(self):
+        """Read x and y from the entry fields, validate them, and
+        show either the computed B(x, y) or an error message."""
         # clear out whatever was shown from last time first
         self.result_label.config(text="")
         self.error_label.config(text="")
@@ -143,6 +150,7 @@ class BetaFunctionApp:
 
 
 def main():
+    """Launch the Beta function calculator GUI."""
     root = tk.Tk()
     BetaFunctionApp(root)
     root.mainloop()

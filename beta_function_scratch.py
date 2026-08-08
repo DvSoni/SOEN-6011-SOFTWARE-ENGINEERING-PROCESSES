@@ -42,12 +42,10 @@ class BetaFunctionError(Exception):
 
     Catching this catches everything below too.
     """
-    pass
 
 
 class NonPositiveValueError(BetaFunctionError):
     """x or y was <= 0. This is what REQ-003 is about."""
-    pass
 
 
 class UndefinedOperationError(BetaFunctionError):
@@ -55,7 +53,6 @@ class UndefinedOperationError(BetaFunctionError):
 
     For example, ln(0) or ln of a negative number.
     """
-    pass
 
 
 class UnsupportedDomainError(BetaFunctionError):
@@ -63,7 +60,6 @@ class UnsupportedDomainError(BetaFunctionError):
 
     For example, a negative base.
     """
-    pass
 
 
 # ---------------------------------------------------------------------
