@@ -70,11 +70,13 @@ class BetaFunctionApp:
 
         # this one shows error messages in red if something went wrong
         self.error_label = ttk.Label(
-            main_frame, text="", font=("Helvetica", 10), foreground="red", wraplength=360
+            main_frame, text="", font=("Helvetica", 10),
+            foreground="red", wraplength=360
         )
         self.error_label.grid(row=5, column=0, columnspan=2, pady=5)
 
-        # so pressing Enter also triggers Calculate, not just clicking the button
+        # so pressing Enter also triggers Calculate, not just
+        # clicking the button
         root.bind("<Return>", lambda event: self.on_calculate())
 
     def on_calculate(self):
@@ -104,15 +106,19 @@ class BetaFunctionApp:
 
         if not x_is_valid and not y_is_valid:
             self.error_label.config(
-                text=f"Error: Please enter a valid number for x instead of '{x_raw}', "
-                     f"and enter a valid number for y instead of '{y_raw}'."
+                text=f"Error: '{x_raw}' is not a valid number for x, "
+                     f"and '{y_raw}' is not a valid number for y."
             )
             return
         if not x_is_valid:
-            self.error_label.config(text=f"Please enter a numeric value greater than 0 for x instead of '{x_raw}'.")
+            self.error_label.config(
+                text=f"Error: '{x_raw}' is not a valid number for x."
+            )
             return
         if not y_is_valid:
-            self.error_label.config(text=f"Please enter a valid number strictly greater than 0 for y instead of '{y_raw}'.")
+            self.error_label.config(
+                text=f"Error: '{y_raw}' is not a valid number for y."
+            )
             return
 
         # now that x and y are valid numbers, actually run the calculation
@@ -138,7 +144,7 @@ class BetaFunctionApp:
 
 def main():
     root = tk.Tk()
-    app = BetaFunctionApp(root)
+    BetaFunctionApp(root)
     root.mainloop()
 
 

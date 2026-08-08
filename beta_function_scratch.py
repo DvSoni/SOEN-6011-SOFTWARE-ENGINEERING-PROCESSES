@@ -38,7 +38,10 @@ message can be more specific about what actually went wrong):
 
 
 class BetaFunctionError(Exception):
-    """Parent class for all my custom errors. Catching this catches everything below too."""
+    """Parent class for all my custom errors.
+
+    Catching this catches everything below too.
+    """
     pass
 
 
@@ -48,12 +51,18 @@ class NonPositiveValueError(BetaFunctionError):
 
 
 class UndefinedOperationError(BetaFunctionError):
-    """For math operations that don't actually have an answer, like ln(0) or ln(negative)."""
+    """For math operations that don't have an answer.
+
+    For example, ln(0) or ln of a negative number.
+    """
     pass
 
 
 class UnsupportedDomainError(BetaFunctionError):
-    """For inputs my real_power function isn't built to handle, like a negative base."""
+    """For inputs my real_power function isn't built to handle.
+
+    For example, a negative base.
+    """
     pass
 
 
@@ -101,14 +110,17 @@ def my_ln(y):
     """
     Computes ln(y) for y > 0.
 
-    Using this formula: ln(y) = 2*(u + u^3/3 + u^5/5 + ...) where u = (y-1)/(y+1)
+    Using this formula: ln(y) = 2*(u + u^3/3 + u^5/5 + ...)
+    where u = (y-1)/(y+1)
     This only converges quickly when y is close to 1, so same idea as
     my_exp -- first shrink y down toward 1 by dividing/multiplying by 2
     a bunch of times, keep track of how many times, then add that back
     at the end using ln(2).
     """
     if y <= 0:
-        raise UndefinedOperationError("Cannot take ln of a non-positive number.")
+        raise UndefinedOperationError(
+            "Cannot take ln of a non-positive number."
+        )
 
     def ln_series(v):
         u = (v - 1) / (v + 1)
@@ -147,9 +159,14 @@ def real_power(base, exponent):
     if base == 0:
         if exponent > 0:
             return 0.0
-        raise UndefinedOperationError("0 raised to a non-positive power is undefined.")
+        raise UndefinedOperationError(
+            "0 raised to a non-positive power is undefined."
+        )
     if base < 0:
-        raise UnsupportedDomainError("Negative base is not supported here (not needed for the Beta function anyway).")
+        raise UnsupportedDomainError(
+            "Negative base is not supported here "
+            "(not needed for the Beta function anyway)."
+        )
 
     return my_exp(exponent * my_ln(base))
 
@@ -208,9 +225,11 @@ def beta_via_integration(x, y, n=1000):
 if __name__ == "__main__":
     # quick sanity checks -- comparing against values I know are correct
     # B(2,3) = 1/12 = 0.08333333...
-    print("B(2, 3)  =", beta_via_integration(2.0, 3.0), " expected ~0.0833333")
+    print("B(2, 3)  =", beta_via_integration(2.0, 3.0),
+          " expected ~0.0833333")
     # B(10,50) is a known tiny value ~1.5916380e-12
-    print("B(10,50) =", beta_via_integration(10.0, 50.0), " expected ~1.5916380e-12")
+    print("B(10,50) =", beta_via_integration(10.0, 50.0),
+          " expected ~1.5916380e-12")
 
     try:
         beta_via_integration(-1.0, 3.0)
