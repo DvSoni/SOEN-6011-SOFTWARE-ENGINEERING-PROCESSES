@@ -1,5 +1,4 @@
 """
-SOEN 6011 - Deliverable 2, Problem 5
 Beta function B(x, y) - GUI version using Tkinter
 
 This file is just the interface -- two text boxes, a button, and a

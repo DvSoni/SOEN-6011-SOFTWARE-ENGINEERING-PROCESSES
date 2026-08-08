@@ -1,5 +1,4 @@
 """
-SOEN 6011 - Deliverable 2, Problem 5
 Beta function B(x, y) - built from scratch
 
 For this part of the project we are not allowed to use the ** operator
