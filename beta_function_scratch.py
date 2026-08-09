@@ -35,7 +35,7 @@ message can be more specific about what actually went wrong):
                                     silently give a wrong number)
 """
 
-
+__version__ = "1.2.1"
 class BetaFunctionError(Exception):
     """Parent class for all my custom errors.
 
